@@ -6,7 +6,7 @@ bs2 = BS('data/cam2/background.avi', 'data/cam2/video.avi')
 bs3 = BS('data/cam3/background.avi', 'data/cam3/video.avi')
 bs4 = BS('data/cam4/background.avi', 'data/cam4/video.avi')
 
-bs1.subtract_background()
+# bs1.subtract_background()
 # bs2.subtract_background()
 # bs3.subtract_background()
 # bs4.subtract_background()
