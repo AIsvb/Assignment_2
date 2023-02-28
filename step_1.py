@@ -3,7 +3,7 @@ from CameraCalibrator import CameraCalibrator
 import glob
 
 if __name__ == "__main__":
-    cam = 1
+    cam = 4
     path = f"data/cam{cam}/calibration/test_1.png"
     calibrator = CameraCalibrator((8, 6), 115, path)
 
@@ -12,6 +12,17 @@ if __name__ == "__main__":
 
     rotation_vectors, translation_vectors, corners = calibrator.get_extrinsic(camera_matrix,
                                                                               distortion_coefficients)
+
+    # Writing the data to XML file
+    file_name = f"data/cam{cam}/config.xml"
+    writer = cv2.FileStorage(file_name, cv2.FileStorage_WRITE)
+
+    writer.write("camera_matrix", camera_matrix)
+    writer.write("distortion_coefficients", distortion_coefficients)
+    writer.write("rotation_vectors", rotation_vectors)
+    writer.write("translation_vectors", translation_vectors)
+
+    writer.release()
 
     # Visualisations
     img = cv2.imread(path)
