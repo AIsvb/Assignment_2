@@ -1,12 +1,12 @@
 import cv2 
 import numpy as np
 
+
 class BackgroundSubtractor:
     def __init__(self, background_path, video_path):
         self.background = background_path
         self.video = video_path
         self.fgbg = cv2.createBackgroundSubtractorMOG2(detectShadows=True)
-        self.kernel = np.ones((3,3), np.uint8)
 
     def subtract_background(self):
         background = cv2.VideoCapture(self.background)
@@ -27,14 +27,11 @@ class BackgroundSubtractor:
 
             # Postprocessing
             foreground[np.abs(foreground) < 254] = 0
-            # foreground = cv2.erode(foreground, self.kernel, iterations=1)
-            # foreground = cv2.dilate(foreground, self.kernel, iterations=1)
-            fgmask = self.draw_contours(foreground)
+            foreground_mask = self.draw_contours(foreground)
 
             # Show video
             cv2.imshow('Frame', frame)
-            # cv2.imshow('Unprocessed', foreground)
-            cv2.imshow('Processed', fgmask)
+            cv2.imshow('Foreground Mask', foreground_mask)
 
             keyboard = cv2.waitKey(1)
             if keyboard == 'q':
