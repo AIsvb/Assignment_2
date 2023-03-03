@@ -48,19 +48,52 @@ def set_voxel_positions():
 def get_cam_positions():
     # Generates dummy camera locations at the 4 corners of the room
     # TODO: You need to input the estimated locations of the 4 cameras in the world coordinates.
-    return [[-64 * block_size, 64 * block_size, 63 * block_size],
-            [63 * block_size, 64 * block_size, 63 * block_size],
-            [63 * block_size, 64 * block_size, -64 * block_size],
-            [-64 * block_size, 64 * block_size, -64 * block_size]], \
+    v = []
+    for i in range(4):
+        cam = i + 1
+        file_name = f"data/cam{cam}/config.xml"
+
+        # Reading from XML
+        reader = cv2.FileStorage(file_name, cv2.FileStorage_READ)
+
+        t_vecs = reader.getNode("translation_vectors").mat()
+        r_vecs = reader.getNode("rotation_vectors").mat()
+        r_vecs, _ = cv2.Rodrigues(r_vecs)
+
+        t_vecs = -np.matrix(r_vecs).T * np.matrix(t_vecs)
+
+        t_vecs = t_vecs.astype(int)
+        translation= [-(t_vecs[0,0]-500)/20, t_vecs[2,0]/20, t_vecs[1,0]/20]
+
+        v.append(translation)
+    return v, \
         [[1.0, 0, 0], [0, 1.0, 0], [0, 0, 1.0], [1.0, 1.0, 0]]
 
 def get_cam_rotation_matrices():
     # Generates dummy camera rotation matrices, looking down 45 degrees towards the center of the room
     # TODO: You need to input the estimated camera rotation matrices (4x4) of the 4 cameras in the world coordinates.
     cam_angles = [[0, 45, -45], [0, 135, -45], [0, 225, -45], [0, 315, -45]]
-    cam_rotations = [glm.mat4(1), glm.mat4(1), glm.mat4(1), glm.mat4(1)]
-    for c in range(len(cam_rotations)):
-        cam_rotations[c] = glm.rotate(cam_rotations[c], cam_angles[c][0] * np.pi / 180, [1, 0, 0])
-        cam_rotations[c] = glm.rotate(cam_rotations[c], cam_angles[c][1] * np.pi / 180, [0, 1, 0])
-        cam_rotations[c] = glm.rotate(cam_rotations[c], cam_angles[c][2] * np.pi / 180, [0, 0, 1])
+    cam_rotations = get_rotation_matrices()
     return cam_rotations
+
+def get_rotation_matrices():
+    M = []
+    for i in range(4):
+        cam = i + 1
+        file_name = f"data/cam{cam}/config.xml"
+
+        # Reading from XML
+        reader = cv2.FileStorage(file_name, cv2.FileStorage_READ)
+
+        r_vecs = reader.getNode("rotation_vectors").mat()
+        r_vecs = cv2.Rodrigues(r_vecs)
+
+        I = np.identity(4, dtype=np.float64)
+        for i in range(3):
+            for j in range(3):
+                I[i, j] = r_vecs[0][i, j]
+
+        mat = glm.mat4(I)
+        mat = glm.rotate(mat, glm.radians(90), (0, 0, 1))
+        M.append(mat)
+    return M
