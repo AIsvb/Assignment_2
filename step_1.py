@@ -24,6 +24,12 @@ if __name__ == "__main__":
 
     writer.release()
 
+    print(rotation_vectors)
+    print(translation_vectors)
+    print(camera_matrix)
+    print(distortion_coefficients)
+
+
     # Visualisations
     img = cv2.imread(path)
     calibrator.draw_chessboard_corners(img, corners)
@@ -31,4 +37,4 @@ if __name__ == "__main__":
     img = cv2.imread(path)
     destination = f"data/cam{cam}/calibration/result.png"
     calibrator.draw_pose(img, rotation_vectors, translation_vectors, camera_matrix,
-                         distortion_coefficients, destination)
+                         distortion_coefficients, destination, cam)

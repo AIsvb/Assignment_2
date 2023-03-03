@@ -7,6 +7,7 @@ class BackgroundSubtractor:
         self.background = background_path
         self.video = video_path
         self.fgbg = cv2.createBackgroundSubtractorMOG2(detectShadows=True)
+        self.kernel = np.ones((3, 3), np.uint8)
 
     def subtract_background(self):
         background = cv2.VideoCapture(self.background)
@@ -28,6 +29,7 @@ class BackgroundSubtractor:
             # Postprocessing
             foreground[np.abs(foreground) < 254] = 0
             foreground_mask = self.draw_contours(foreground)
+            cv2.erode(foreground_mask, kernel)
 
             # Show video
             cv2.imshow('Frame', frame)

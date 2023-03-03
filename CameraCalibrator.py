@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
 
-
 class CameraCalibrator:
 
     def __init__(self, n_corners, square_size, path):
@@ -123,7 +122,7 @@ class CameraCalibrator:
         img = cv2.line(img, corner, tuple(image_points[2].ravel().astype(int)), (0, 0, 255), 2)
         return img
 
-    def draw_pose(self, img, r_vecs, t_vecs, camera_matrix, distortion_coef, destination):
+    def draw_pose(self, img, r_vecs, t_vecs, camera_matrix, distortion_coef, destination, cam):
         axes = np.float32([[4, 0, 0], [0, 4, 0], [0, 0, 4]]).reshape(-1, 3) * self.square_size
 
         # project 3D points to image plane
@@ -139,5 +138,4 @@ class CameraCalibrator:
 
         # saving the edited image
         cv2.imwrite(destination, img)
-
 
