@@ -3,7 +3,7 @@ from CameraCalibrator import CameraCalibrator
 import glob
 
 if __name__ == "__main__":
-    cam = 3
+    cam = 4
     path = f'data/cam{cam}/calibration/test_1.png'
     calibrator = CameraCalibrator((8, 6), 115, path)
 

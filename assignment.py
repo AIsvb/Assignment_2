@@ -3,21 +3,23 @@ import random
 import numpy as np
 import cv2
 from LookupTable import LookupTable as LT
-import PIL
 
+
+# Masks to start off with
 mask1 = cv2.imread('data/cam1/mask.png')
-mask2 = cv2.imread('data/cam2/mask.png')
+mask2 = cv2.imread('data/cam2/mask2_dilate3.png')
 mask3 = cv2.imread('data/cam3/mask.png')
 mask4 = cv2.imread('data/cam4/mask.png')
 
-
-LT = LT(50, 50, 100)
+# Create a look-up table
+LT = LT(50, 75, 100, mask1, mask2, mask3, mask4)
 LT.create_voxels()
-LT.create_dictionary()
-list = LT.create_final_list(mask1, mask2, mask3, mask4)
+LT.create_lookup_table()
+
+# Function to get all voxels that need to be shown
+list = LT.get_voxels(mask1, mask2, mask3, mask4)
 
 block_size = 1.0
-
 
 def generate_grid(width, depth):
     # Generates the floor grid locations
@@ -26,16 +28,21 @@ def generate_grid(width, depth):
     for x in range(width):
         for z in range(depth):
             data.append([x*block_size - width/2, -block_size, z*block_size - depth/2])
-            colors.append([1.0,1.0,1.0])
+            colors.append([1, 1, 1])
     return data, colors
 
-
-def set_voxel_positions(width, height, depth):
-    # Generates random voxel locations
+def set_voxel_positions():
     data, colors = [], []
+
+    # mask1 = cv2.imread(m1)
+    # mask2 = cv2.imread(m2)
+    # mask3 = cv2.imread(m3)
+    # mask4 = cv2.imread(m4)
+
+    # for v in LT.get_voxels(mask1, mask2, mask3, mask4):
     for v in list:
-        data.append([v.voxel_coordinates[0] * 0.02 - 8, v.voxel_coordinates[2] * 0.02, v.voxel_coordinates[1] * 0.02 - 10])
-        colors.append([0.5, 0.5, 0.5])
+        data.append([v.voxel_coordinates[0] * 0.05 - 8, v.voxel_coordinates[2] * 0.05, v.voxel_coordinates[1] * 0.05 - 10])
+        colors.append([v.color[0], v.color[1], v.color[2]])
     return data, colors
 
 def get_cam_positions():
@@ -46,7 +53,6 @@ def get_cam_positions():
             [63 * block_size, 64 * block_size, -64 * block_size],
             [-64 * block_size, 64 * block_size, -64 * block_size]], \
         [[1.0, 0, 0], [0, 1.0, 0], [0, 0, 1.0], [1.0, 1.0, 0]]
-
 
 def get_cam_rotation_matrices():
     # Generates dummy camera rotation matrices, looking down 45 degrees towards the center of the room
