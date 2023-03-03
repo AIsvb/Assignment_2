@@ -29,15 +29,19 @@ class BackgroundSubtractor:
             # Postprocessing
             foreground[np.abs(foreground) < 254] = 0
             foreground_mask = self.draw_contours(foreground)
-            cv2.erode(foreground_mask, kernel)
+            foreground_mask = cv2.erode(foreground_mask, self.kernel)
+            foreground_mask = cv2.dilate(foreground_mask, self.kernel, iterations=3)
 
             # Show video
             cv2.imshow('Frame', frame)
             cv2.imshow('Foreground Mask', foreground_mask)
+            cv2.imwrite('/Users/macbook/Desktop/GekleurdeFrames/video5.png', frame)
 
             keyboard = cv2.waitKey(1)
             if keyboard == 'q':
                 break
+
+        cv2.imwrite('/Users/macbook/Desktop/mask2_dilate3.png', foreground_mask)
 
         video.release()
         cv2.waitKey(0)
