@@ -12,6 +12,7 @@ class BackgroundSubtractor:
     def subtract_background(self):
         background = cv2.VideoCapture(self.background)
         video = cv2.VideoCapture(self.video)
+        counter = 0
 
         while True:
             # Read background video and train background model
@@ -29,19 +30,16 @@ class BackgroundSubtractor:
             # Postprocessing
             foreground[np.abs(foreground) < 254] = 0
             foreground_mask = self.draw_contours(foreground)
-            foreground_mask = cv2.erode(foreground_mask, self.kernel)
-            foreground_mask = cv2.dilate(foreground_mask, self.kernel, iterations=3)
 
             # Show video
             cv2.imshow('Frame', frame)
             cv2.imshow('Foreground Mask', foreground_mask)
-            cv2.imwrite('/Users/macbook/Desktop/GekleurdeFrames/video5.png', frame)
+            cv2.imwrite(f'/Users/macbook/Desktop/masks/frames2/{counter}.png', foreground_mask)
+            counter += 1
 
             keyboard = cv2.waitKey(1)
             if keyboard == 'q':
                 break
-
-        cv2.imwrite('/Users/macbook/Desktop/mask2_dilate3.png', foreground_mask)
 
         video.release()
         cv2.waitKey(0)
@@ -79,6 +77,12 @@ class BackgroundSubtractor:
 
         # Draw contours of the subject on the copy image
         cv2.drawContours(image_copy, [contours[0]], -1, (255, 255, 255), thickness=cv2.FILLED)
+        # image_copy = cv2.erode(image_copy, self.kernel)
+
+        if '2' in self.video:
+            roi = image_copy[361:486, 0:644]
+            roi[:] = cv2.dilate(roi, self.kernel, iterations=5)
+
         for i in range(1, len(contours)):
             if contours2[i][2] == contours2[0][0]:
                 if contours2[i][1] > min_area:

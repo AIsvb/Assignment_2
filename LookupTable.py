@@ -52,38 +52,103 @@ class LookupTable:
                     if mask1[y,x][0] == 255:
                         try:
                             for v in self.lookup_table[1, (x,y)]:
-                                v.show1 = True
+                                v.show1 = 1
                         except (KeyError):
                             0
                     if mask2[y,x][0] == 255:
                         try:
                             for v in self.lookup_table[2, (x,y)]:
-                                v.show2 = True
+                                v.show2 = 1
                         except (KeyError):
                             0
                     if mask3[y,x][0] == 255:
                         try:
                             for v in self.lookup_table[3, (x,y)]:
-                                v.show3 = True
+                                v.show3 = 1
                         except (KeyError):
                             0
                     if mask4[y,x][0] == 255:
                         try:
                             for v in self.lookup_table[4, (x,y)]:
-                                v.show4 = True
+                                v.show4 = 1
                         except (KeyError):
                             0
 
         # Loop over all voxels, if 'on' in all 4 views, color it and add it to the list
         for v in self.voxels:
-            if v.show1 == True:
-                if v.show2 == True:
-                    if v.show3 == True:
-                        if v.show4 == True:
-                            v.set_color(self.colored_frame1, self.colored_frame2, self.colored_frame3, self.colored_frame4)
-                            list.append(v)
+            if v.show1 + v.show2 + v.show3 + v.show4 == 4:
+                v.set_color(self.colored_frame1, self.colored_frame2, self.colored_frame3, self.colored_frame4)
+                list.append(v)
 
         return list
+
+    # Function to get changed voxels between two frames
+    def get_voxels_XOR(self, list1, list2, list3, list4, complete_list):
+        # Already existing list with voxels that are turned 'on'
+        voxel_list = complete_list
+
+        # List to store voxels that have changed
+        changed_voxels = []
+
+        # For every XOR-frame, loop over all pixels. If it's white, switch the 'show' property of the corresponding voxels
+        # and add it to the list of changed voxels.
+        for x in range(644):
+            for y in range(486):
+                    if list1[y,x][0] == 255:
+                        try:
+                            for v in self.lookup_table[1, (x, y)]:
+                                if v.show1 == 1:
+                                    v.show1 = 0
+                                    changed_voxels.append(v)
+                                else:
+                                    v.show1 = 1
+                                    changed_voxels.append(v)
+                        except (KeyError):
+                            0
+                    if list2[y,x][0] == 255:
+                        try:
+                            for v in self.lookup_table[2, (x, y)]:
+                                if v.show2 == 1:
+                                    v.show2 = 0
+                                    changed_voxels.append(v)
+                                else:
+                                    v.show2 = 1
+                                    changed_voxels.append(v)
+                        except (KeyError):
+                            0
+                    if list3[y,x][0] == 255:
+                        try:
+                            for v in self.lookup_table[3, (x, y)]:
+                                if v.show3 == 1:
+                                    v.show3 = 0
+                                    changed_voxels.append(v)
+                                else:
+                                    v.show3 = 1
+                                    changed_voxels.append(v)
+                        except (KeyError):
+                            0
+                    if list4[y,x][0] == 255:
+                        try:
+                            for v in self.lookup_table[4, (x, y)]:
+                                if v.show4 == 1:
+                                    v.show4 = 0
+                                    changed_voxels.append(v)
+                                else:
+                                    v.show4 = 1
+                                    changed_voxels.append(v)
+                        except (KeyError):
+                            0
+
+        # Loop over all changed voxels and turn them 'on' or 'off' by adding or removing them from the final list
+        for v in changed_voxels:
+            if v.show1 + v.show2 + v.show3 + v.show4 == 4:
+                            v.set_color(self.colored_frame1, self.colored_frame2, self.colored_frame3,
+                                        self.colored_frame4)
+                            voxel_list.append(v)
+            else:
+                if v in voxel_list:
+                    voxel_list.remove(v)
+        return voxel_list
 
     # Function to set camera intrinsics and extrinsics
     def configure_cameras(self):
@@ -135,11 +200,11 @@ class Voxel:
         self.cam_coordinates = [(int(self.cam1_coordinates[0][0][0]),int(self.cam1_coordinates[0][0][1])), (int(self.cam2_coordinates[0][0][0]),int(self.cam2_coordinates[0][0][1])),
                                 (int(self.cam3_coordinates[0][0][0]), int(self.cam3_coordinates[0][0][1])), (int(self.cam4_coordinates[0][0][0]),int(self.cam4_coordinates[0][0][1]))]
 
-        # Boolean per view whether the voxel is on the foreground
-        self.show1 = False
-        self.show2 = False
-        self.show3 = False
-        self.show4 = False
+        # Integer per view whether the voxel is on the foreground, 0 = off, 1 = on.
+        self.show1 = 0
+        self.show2 = 0
+        self.show3 = 0
+        self.show4 = 0
 
     # Function to set the color of a voxel given 4 input frames
     def set_color(self, frame1, frame2, frame3, frame4):

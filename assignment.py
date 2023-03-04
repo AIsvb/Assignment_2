@@ -5,9 +5,9 @@ import cv2
 from LookupTable import LookupTable as LT
 
 
-# Masks to start off with
+# Masks used for initialization (frame 0 of each view)
 mask1 = cv2.imread('data/cam1/mask.png')
-mask2 = cv2.imread('data/cam2/mask2_dilate3.png')
+mask2 = cv2.imread('data/cam2/mask.png')
 mask3 = cv2.imread('data/cam3/mask.png')
 mask4 = cv2.imread('data/cam4/mask.png')
 
@@ -16,8 +16,8 @@ LT = LT(50, 75, 100, mask1, mask2, mask3, mask4)
 LT.create_voxels()
 LT.create_lookup_table()
 
-# Function to get all voxels that need to be shown
-list = LT.get_voxels(mask1, mask2, mask3, mask4)
+# List of first voxels that need to be shown
+voxel_list = LT.get_voxels(mask1, mask2, mask3, mask4)
 
 block_size = 1.0
 
@@ -28,22 +28,26 @@ def generate_grid(width, depth):
     for x in range(width):
         for z in range(depth):
             data.append([x*block_size - width/2, -block_size, z*block_size - depth/2])
-            colors.append([1, 1, 1])
+            colors.append([57/255,138/255,123/255])
     return data, colors
 
 def set_voxel_positions():
     data, colors = [], []
 
-    # mask1 = cv2.imread(m1)
-    # mask2 = cv2.imread(m2)
-    # mask3 = cv2.imread(m3)
-    # mask4 = cv2.imread(m4)
-
-    # for v in LT.get_voxels(mask1, mask2, mask3, mask4):
-    for v in list:
-        data.append([v.voxel_coordinates[0] * 0.05 - 8, v.voxel_coordinates[2] * 0.05, v.voxel_coordinates[1] * 0.05 - 10])
+    for v in voxel_list:
+        data.append([v.voxel_coordinates[0] * 0.05 - 30, v.voxel_coordinates[2] * 0.05, v.voxel_coordinates[1] * 0.05 - 30])
         colors.append([v.color[0], v.color[1], v.color[2]])
     return data, colors
+
+# Function to set voxels based on a XOR-mask
+def set_voxel_positions_XOR(frame1, frame2, frame3, frame4, list):
+    data, colors = [], []
+    new_voxel_list = LT.get_voxels_XOR(frame1, frame2, frame3, frame4, list)
+    for v in new_voxel_list:
+        data.append([v.voxel_coordinates[0] * 0.05 - 30, v.voxel_coordinates[2] * 0.05, v.voxel_coordinates[1] * 0.05 - 30])
+        colors.append([v.color[0], v.color[1], v.color[2]])
+
+    return data, colors, new_voxel_list
 
 def get_cam_positions():
     # Generates dummy camera locations at the 4 corners of the room

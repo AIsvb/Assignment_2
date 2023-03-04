@@ -6,15 +6,16 @@ from engine.buffer.texture import *
 from engine.buffer.hdrbuffer import HDRBuffer
 from engine.buffer.blurbuffer import BlurBuffer
 from engine.effect.bloom import Bloom
-from assignment import set_voxel_positions, generate_grid, get_cam_positions, get_cam_rotation_matrices
+from assignment import set_voxel_positions, generate_grid, get_cam_positions, get_cam_rotation_matrices, set_voxel_positions_XOR, voxel_list
 from engine.camera import Camera
 from engine.config import config
+import cv2
+import time
 
 cube, hdrbuffer, blurbuffer, lastPosX, lastPosY = None, None, None, None, None
 firstTime = True
 window_width, window_height = config['window_width'], config['window_height']
 camera = Camera(glm.vec3(0, 100, 0), pitch=-90, yaw=0, speed=40)
-counter = 0
 
 
 def draw_objs(obj, program, perspective, light_pos, texture, normal, specular, depth):
@@ -185,10 +186,47 @@ def key_callback(window, key, scancode, action, mods):
     if key == glfw.KEY_G and action == glfw.PRESS:
         global cube
         positions, colors = set_voxel_positions()
-        # positions, colors = set_voxel_positions(f'data/cam1/frames1/{counter}.png',f'data/cam2/frames2/{counter}.png',
-        #                                         f'data/cam3/frames3/{counter}.png',f'data/cam2/frames4/{counter}.png')
         cube.set_multiple_positions(positions, colors)
+    if key == glfw.KEY_1 and action == glfw.PRESS:
+         set_XOR_voxels(2, voxel_list)
+    if key == glfw.KEY_2 and action == glfw.PRESS:
+         set_XOR_voxels(3, voxel_list)
+    if key == glfw.KEY_3 and action == glfw.PRESS:
+         set_XOR_voxels(4, voxel_list)
+    if key == glfw.KEY_4 and action == glfw.PRESS:
+         set_XOR_voxels(5, voxel_list)
+    if key == glfw.KEY_5 and action == glfw.PRESS:
+        set_XOR_voxels(6, voxel_list)
+    if key == glfw.KEY_6 and action == glfw.PRESS:
+         set_XOR_voxels(7, voxel_list)
+    if key == glfw.KEY_7 and action == glfw.PRESS:
+         set_XOR_voxels(8, voxel_list)
+    if key == glfw.KEY_8 and action == glfw.PRESS:
+         set_XOR_voxels(9, voxel_list)
+    if key == glfw.KEY_9 and action == glfw.PRESS:
+         set_XOR_voxels(10, voxel_list)
 
+def set_XOR_voxels(c, list):
+    counter = c
+
+    frame1_a = cv2.imread(f'data/cam1/frames1/{counter}.png')
+    frame2_a = cv2.imread(f'data/cam2/frames2/{counter}.png')
+    frame3_a = cv2.imread(f'data/cam3/frames3/{counter}.png')
+    frame4_a = cv2.imread(f'data/cam4/frames4/{counter}.png')
+
+    frame1_b = cv2.imread(f'data/cam1/frames1/{counter - 1}.png')
+    frame2_b = cv2.imread(f'data/cam2/frames2/{counter - 1}.png')
+    frame3_b = cv2.imread(f'data/cam3/frames3/{counter - 1}.png')
+    frame4_b = cv2.imread(f'data/cam4/frames4/{counter - 1}.png')
+
+    XOR_1 = frame1_a ^ frame1_b
+    XOR_2 = frame2_a ^ frame2_b
+    XOR_3 = frame3_a ^ frame3_b
+    XOR_4 = frame4_a ^ frame4_b
+
+    positions, colors, new_voxel_list = set_voxel_positions_XOR(XOR_1, XOR_2, XOR_3, XOR_4, list)
+    cube.set_multiple_positions(positions, colors)
+    print(f"3D-reconstruction #{counter} made.")
 
 
 def mouse_move(win, pos_x, pos_y):
