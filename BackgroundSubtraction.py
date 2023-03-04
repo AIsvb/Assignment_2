@@ -1,4 +1,8 @@
-import cv2 
+# Computer Vision: Assignment 2
+# Creators: Gino Kuiper and Sander van Bennekom
+# Date: 04-03-2023
+
+import cv2
 import numpy as np
 
 
@@ -34,7 +38,7 @@ class BackgroundSubtractor:
             # Show video
             cv2.imshow('Frame', frame)
             cv2.imshow('Foreground Mask', foreground_mask)
-            cv2.imwrite(f'/Users/macbook/Desktop/masks/frames2/{counter}.png', foreground_mask)
+            cv2.imwrite(f'data/cam2/frames2/{counter}.png', foreground_mask)
             counter += 1
 
             keyboard = cv2.waitKey(1)

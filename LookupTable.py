@@ -1,6 +1,11 @@
+# Computer Vision: Assignment 2
+# Creators: Gino Kuiper and Sander van Bennekom
+# Date: 04-03-2023
+
 import cv2
 import numpy as np
 import PIL
+
 
 class LookupTable:
     def __init__(self, width, height, depth, mask1, mask2, mask3, mask4):
@@ -152,39 +157,20 @@ class LookupTable:
 
     # Function to set camera intrinsics and extrinsics
     def configure_cameras(self):
-        self.r_vecs1 = np.array([[0.77191993], [-1.94787735], [1.66681305]])
-        self.t_vecs1 = np.array([[741.44595085], [814.59347198], [4108.89617871]])
-        self.camera_matrix1 = np.array([[492.28392884, 0, 341.09828206], [0, 494.68543396, 225.08391043], [0, 0, 1]])
-        self.distortion_coef1 = np.array([[-0.39005684, 0.252636, 0.00082683, -0.00171959, -0.10728103]])
+        self.cam1 = self.configure_camera(1)
+        self.cam2 = self.configure_camera(2)
+        self.cam3 = self.configure_camera(3)
+        self.cam4 = self.configure_camera(4)
 
-        self.r_vecs2 = np.array([[-0.0303447], [2.19974291], [-2.27736376]])
-        self.t_vecs2 = np.array([[534.28523399], [1516.44834375], [3575.31932291]])
-        self.camera_matrix2 = np.array([[484.86160645, 0, 331.69114576], [0, 486.35288535, 221.44839849], [0, 0, 1]])
-        self.distortion_coef2 = np.array([[-0.32183815, 0.04770667, 0.00122654, -0.000639, 0.08593832]])
+    # Method to load the intrinsics and extrinsics for a given camera
+    def configure_camera(self, camera):
+        reader = cv2.FileStorage(f"data/cam{camera}/config.xml", cv2.FileStorage_READ)
+        t_vecs = reader.getNode("translation_vectors").mat()
+        r_vecs = reader.getNode("rotation_vectors").mat()
+        camera_matrix = reader.getNode("camera_matrix").mat()
+        distortion_coef = reader.getNode("distortion_coefficients").mat()
 
-        self.r_vecs3 = np.array([[1.3706259], [1.04505242], [-1.06343596]])
-        self.t_vecs3 = np.array([[-872.90685764], [1249.23345862], [3195.5833473]])
-        self.camera_matrix3 = np.array([[484.52081847, 0, 315.39239273], [0, 482.61964346, 228.89477142], [0, 0, 1]])
-        self.distortion_coef3 = np.array([[-0.36574808, 0.18783658, 0.00264871, 0.00152216 - 0.06609458]])
-
-        self.r_vecs4 = np.array([[0.84982666], [1.80824974], [-1.60508691]])
-        self.t_vecs4 = np.array([[-446.95048864], [892.0069103], [4770.92442507]])
-        self.camera_matrix4 = np.array([[486.79378731, 0, 341.57350559], [0, 489.86418276, 239.93430545], [0, 0, 1]])
-        self.distortion_coef4 = np.array([[-0.37637834, 0.21504516, -0.00046899, -0.00127208, -0.07991701]])
-
-        self.cam1 = Camera(self.r_vecs1, self.t_vecs1, self.camera_matrix1, self.distortion_coef1)
-        self.cam2 = Camera(self.r_vecs2, self.t_vecs2, self.camera_matrix2, self.distortion_coef2)
-        self.cam3 = Camera(self.r_vecs3, self.t_vecs3, self.camera_matrix3, self.distortion_coef3)
-        self.cam4 = Camera(self.r_vecs4, self.t_vecs4, self.camera_matrix4, self.distortion_coef4)
-
-    # def configure_camera(self, camera):
-    #     reader = cv2.FileStorage(f'data/cam{camera}/config2.xml', cv2.FileStorage_READ)
-    #     r_vecs = np.array(reader.getNode("rotation_vectors"))
-    #     t_vecs = np.array(reader.getNode("translation_vectors"))
-    #     camera_matrix = np.array(reader.getNode("camera_matrix"))
-    #     distortion_coef = np.array(reader.getNode("distortion_coefficients"))
-    #
-    #     return Camera(r_vecs, t_vecs, camera_matrix, distortion_coef)
+        return Camera(r_vecs, t_vecs, camera_matrix, distortion_coef)
 
 class Voxel:
     def __init__(self, width, height, depth, cam1, cam2, cam3, cam4):

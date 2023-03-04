@@ -10,7 +10,6 @@ from assignment import set_voxel_positions, generate_grid, get_cam_positions, ge
 from engine.camera import Camera
 from engine.config import config
 import cv2
-import time
 
 cube, hdrbuffer, blurbuffer, lastPosX, lastPosY = None, None, None, None, None
 firstTime = True
@@ -179,7 +178,7 @@ def resize_callback(window, w, h):
         blurbuffer.delete()
         blurbuffer.create(window_width_px, window_height_px)
 
-
+t = 1
 def key_callback(window, key, scancode, action, mods):
     if key == glfw.KEY_ESCAPE and action == glfw.PRESS:
         glfw.set_window_should_close(window, glfw.TRUE)
@@ -204,7 +203,7 @@ def key_callback(window, key, scancode, action, mods):
     if key == glfw.KEY_8 and action == glfw.PRESS:
          set_XOR_voxels(9, voxel_list)
     if key == glfw.KEY_9 and action == glfw.PRESS:
-         set_XOR_voxels(10, voxel_list)
+        set_XOR_voxels(10, voxel_list)
 
 def set_XOR_voxels(c, list):
     counter = c
